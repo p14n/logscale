@@ -1,0 +1,9 @@
+.calva/
+.clj-kondo/.cache
+.cpcache/
+.idea/
+.lsp/
+.nrepl-port
+.rebel_readline_history
+*.iml
+*.*~

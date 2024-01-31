@@ -1,0 +1,4 @@
+{:deps {datascript/datascript {:mvn/version "1.6.1"}
+        org.foundationdb/fdb-java {:mvn/version "7.1.42"}
+        org.testcontainers/testcontainers {:mvn/version "1.17.6"}
+        io.github.aleris/testcontainers-foundationdb {:mvn/version "1.0.0"}}}
