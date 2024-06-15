@@ -1,4 +1,10 @@
 {:deps {datascript/datascript {:mvn/version "1.6.1"}
         org.foundationdb/fdb-java {:mvn/version "7.1.42"}
-        org.testcontainers/testcontainers {:mvn/version "1.17.6"}
-        io.github.aleris/testcontainers-foundationdb {:mvn/version "1.0.0"}}}
+        com.taoensso/nippy {:mvn/version "3.4.2"}
+        ;org.testcontainers/testcontainers {:mvn/version "1.17.6"}
+        ;io.github.aleris/testcontainers-foundationdb {:mvn/version "1.0.0"}
+        }
+
+ :aliases {:kaocha {:extra-paths ["test"]
+                    :main-opts ["-m" "kaocha.runner"]
+                    :extra-deps {lambdaisland/kaocha {:mvn/version "1.87.1366"}}}}}
