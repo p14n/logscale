@@ -12,15 +12,19 @@
           (edn/read-string)))
 
 (defn make-tx-storage
-  [tr {:keys [freeze-fn thaw-fn] :or {freeze-fn default-freeze-fn
-                                      thaw-fn default-thaw-fn}}]
+  [tr {:keys [freeze-fn thaw-fn root-keys]
+       :or {freeze-fn default-freeze-fn
+            thaw-fn default-thaw-fn}}]
+  (when (nil? root-keys)
+    (throw (ex-info "root-keys must be set" {})))
   (reify ds/IStorage
     (-store [_ addr+data-seq]
       (println "Store keys" (map first addr+data-seq))
       (fdb/-set! tr
                  (->> addr+data-seq
                       (remove (fn [[addr _]] (= 1 addr)))
-                      (map (fn [[addr data]] [addr (-> (freeze-fn data))])))))
+                      (map (fn [[addr data]]
+                             [(conj root-keys addr) (-> (freeze-fn data))])))))
     (-restore [_ addr]
       (println "Restore key" addr)
-      (thaw-fn (fdb/-get tr addr)))))
+      (thaw-fn (fdb/-get tr (conj root-keys addr))))))

@@ -16,24 +16,24 @@
           (apply [_ tr]
             (f tr)))))
 
-(defn pack-tuple [k]
-  (.pack (Tuple/from (into-array [k]))))
+(defn- pack-tuple [ks]
+  (.pack (Tuple/from (into-array ks))))
 
 (defn -set! [tr key-values]
-  (run! (fn [[k v]]
-          (let [key (pack-tuple k)
-                value (pack-tuple v)]
+  (run! (fn [[ks v]]
+          (let [key (pack-tuple ks)
+                value (pack-tuple [v])]
             (.set tr key value)))
         key-values))
 
-(defn -get [tr key]
-  (->> key
+(defn -get [tr keys]
+  (->> keys
        (pack-tuple)
        (.get tr)
        (.join)))
 
-(defn -clear [tr key]
-  (->> key
+(defn -clear [tr keys]
+  (->> keys
        (pack-tuple)
        (.clear tr)))
 
