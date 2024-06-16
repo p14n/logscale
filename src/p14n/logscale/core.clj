@@ -3,21 +3,28 @@
             [p14n.logscale.fdb :as fdb]
             [p14n.logscale.storage :as s]))
 
-(defn with-database
-  ([f opts]
+(defn with-transaction
+  ([f]
    (with-open [db (fdb/open-db)]
-     (with-database f opts db)))
-  ([f {:keys [schema datascript-opts] :as opts} fdb]
+     (with-transaction f db)))
+  ([f fdb]
    (fdb/transact!
     fdb
-    (fn [transaction]
-      (let [txs (s/make-tx-storage transaction opts)
-            conn (or (d/restore-conn txs datascript-opts)
-                     (d/create-conn schema datascript-opts))
-            res (f conn)]
-        (d/store (d/db conn) txs)
-        res)))))
+    #(f %))))
 
-(defn create-db-function [{:keys [schema datascript-opts freeze-fn thaw-fn] :as opts}]
+(defn with-connection
+  ([f opts]
+   (fn [transaction]
+     (with-connection f opts transaction)))
+  ([f {:keys [schema datascript-opts] :as opts} transaction]
+   (let [txs (s/make-tx-storage transaction opts)
+         conn (or (d/restore-conn txs datascript-opts)
+                  (d/create-conn schema datascript-opts))
+         res (f conn)]
+     (d/store (d/db conn) txs)
+     res)))
+
+(defn create-datascript-function [{:keys [schema datascript-opts freeze-fn thaw-fn root-keys] :as opts}]
   (fn [f]
-    (with-database f opts)))
+    (-> (with-connection f opts)
+        (with-transaction))))

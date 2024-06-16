@@ -19,12 +19,10 @@
     (throw (ex-info "root-keys must be set" {})))
   (reify ds/IStorage
     (-store [_ addr+data-seq]
-      (println "Store keys" (map first addr+data-seq))
       (fdb/-set! tr
                  (->> addr+data-seq
                       (remove (fn [[addr _]] (= 1 addr)))
                       (map (fn [[addr data]]
-                             [(conj root-keys addr) (-> (freeze-fn data))])))))
+                             [(conj root-keys addr) (freeze-fn data)])))))
     (-restore [_ addr]
-      (println "Restore key" addr)
       (thaw-fn (fdb/-get tr (conj root-keys addr))))))

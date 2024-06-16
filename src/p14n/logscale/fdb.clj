@@ -17,12 +17,13 @@
             (f tr)))))
 
 (defn- pack-tuple [ks]
-  (.pack (Tuple/from (into-array ks))))
+  (.pack (Tuple/from (into-array Object ks))))
 
 (defn -set! [tr key-values]
   (run! (fn [[ks v]]
           (let [key (pack-tuple ks)
                 value (pack-tuple [v])]
+            ;(println "Setting" key value)
             (.set tr key value)))
         key-values))
 
@@ -37,13 +38,8 @@
        (pack-tuple)
        (.clear tr)))
 
-(defn pr [x]
-  (println x)
-  x)
-
 (defn bytes-to-string [bytes]
   (-> bytes
       (Tuple/fromBytes)
-      (pr)
       (.getString 0)))
 

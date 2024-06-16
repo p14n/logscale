@@ -13,7 +13,7 @@
         (d/store (d/db conn) s)
         (is (= #{["Dean" 94]} (tu/get-person (d/db conn) "Dean")))
         (println "x")
-        (is (not (empty? @atom-map)))))
+        (is (seq @atom-map))))
     (testing "Database restores from an atom"
       (let [conn (d/restore-conn s (assoc tu/opts :schema tu/schema))]
         (is (= #{["Dean" 94]} (tu/get-person (d/db conn) "Dean")))))))
