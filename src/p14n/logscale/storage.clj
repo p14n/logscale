@@ -16,7 +16,7 @@
        :or {freeze-fn default-freeze-fn
             thaw-fn default-thaw-fn}}]
   (when (nil? root-keys)
-    (throw (ex-info "root-keys must be set" {})))
+    (throw (ex-info "Root-keys must be set" {})))
   (reify ds/IStorage
     (-store [_ addr+data-seq]
       (fdb/-set! tr

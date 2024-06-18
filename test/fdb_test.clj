@@ -98,3 +98,27 @@
           (is (= {:name "Tom" :age 4 :aka ["Not Me"]}
                  (-> (fdb/-get transaction ["test" "dual" "hello"])
                      (bytes->tuple->nippy-thaw)))))))))
+
+
+(deftest pull-query-test
+  (let [fdb (sut/create-datascript-function {:schema {:owners {:db/valueType :db.type/ref :db/cardinality :db.cardinality/many}
+                                                      :registered-address {:db/valueType :db.type/ref}}
+                                             :root-keys ["test" "pull"]
+                                             :datascript-opts tu/opts
+                                             :freeze-fn nippy/freeze
+                                             :thaw-fn bytes->tuple->nippy-thaw})]
+    (testing "Database pull queries example"
+      (reset ["test" "pull" 0])
+      (fdb
+       #(d/transact! % [{:db/id -1 :name  "Dean"}
+                        {:db/id -2 :account-type :isa :owners [-1] :registered-address -3}
+                        {:db/id -3 :postcode "IPXX 21"}]))
+
+      (is (= [{:owners [{:name "Dean"}] :registered-address {:postcode "IPXX 21"}}]
+             (fdb #(d/q '[:find [(pull ?e [{:owners [:name] :registered-address [:postcode]}]) ...]
+                          :where [?e :account-type :isa]] (d/db %)))))
+
+      (is (= [{:name "Dean" :owns [{:account-type :isa :registered-address {:postcode "IPXX 21"}}]}]
+             (fdb #(d/q '[:find [(pull ?e [:name {[:_owners :as :owns]
+                                                  [:account-type {:registered-address [:postcode]}]}]) ...]
+                          :where [?e :name "Dean"]] (d/db %))))))))

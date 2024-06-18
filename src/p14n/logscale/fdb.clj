@@ -23,7 +23,6 @@
   (run! (fn [[ks v]]
           (let [key (pack-tuple ks)
                 value (pack-tuple [v])]
-            ;(println "Setting" key value)
             (.set tr key value)))
         key-values))
 
